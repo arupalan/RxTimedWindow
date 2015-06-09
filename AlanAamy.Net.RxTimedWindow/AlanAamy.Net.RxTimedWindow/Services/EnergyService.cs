@@ -4,14 +4,16 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Services;
+using System.Reactive.Concurrency;
 
 namespace AlanAamy.Net.RxTimedWindow.Services
 {
     public interface IEnergyService
     {
-        IObservable<IEnumerable<PowerTrade>> GetTradesObservable();
+        IObservable<IEnumerable<PowerTrade>> GetTradesObservable(int periodInMinutes);
     }
 
     /// <summary>
@@ -23,17 +25,25 @@ namespace AlanAamy.Net.RxTimedWindow.Services
     {
         private static readonly IPowerService powerService = new PowerService();
 
-        public IObservable<IEnumerable<PowerTrade>> GetTradesObservable()
+        public IObservable<IEnumerable<PowerTrade>> GetTradesObservable(int periodInMinutes)
         {
-            return Observable.Create<IEnumerable<PowerTrade>>(async (observer,token) =>
+            var innerObservable = Observable.Interval(TimeSpan.FromMinutes(periodInMinutes), Scheduler.ThreadPool);
+            return Observable.Create<IEnumerable<PowerTrade>>( async (observer,token) =>
             {
-                IEnumerable<PowerTrade> trades;
-                while ((trades = await powerService.GetTradesAsync(DateTime.Now.Date)) != null)
-                 {
-                     if (token.IsCancellationRequested) { return; }
-                     observer.OnNext(trades);
-                 }
-                 observer.OnCompleted();
+                ManualResetEvent eventResetEvent = new ManualResetEvent(false);
+
+                using (innerObservable.Subscribe( async x =>
+                {
+                    IEnumerable<PowerTrade>  trades = await powerService.GetTradesAsync(DateTime.Now.Date);
+                    observer.OnNext(trades);
+                    if (token.IsCancellationRequested)
+                    {
+                        eventResetEvent.Set();
+                    }
+                }))
+                {
+                    eventResetEvent.WaitOne();
+                }
             });          
         }
     }
