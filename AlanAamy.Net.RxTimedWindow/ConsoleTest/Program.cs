@@ -38,6 +38,13 @@ namespace ConsoleTest
                 //    return Observable.Empty<PowerPeriod>();
                 //})
                 .OnErrorResumeNext(Observable.Empty<PowerPeriod>())
+                .GroupBy( m => m.Period)
+                .Select(
+                s => new PowerPeriod
+                {
+                    Period = s.Key,
+                    Volume = s.Sum(_ => _.Volume).SingleAsync()
+                })
                 .Subscribe(m =>
                     Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}", m.Period, m.Volume,
                     DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId));
