@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
@@ -10,7 +12,7 @@ using Services;
 
 namespace AlanAamy.Net.RxTimedWindow.Models
 {
-    public sealed class ObservableTradeModel
+    public sealed class ObservableTradeModel 
     {
         private readonly IPowerService powerService;
         public ObservableTradeModel(IPowerService powerService)
@@ -21,29 +23,41 @@ namespace AlanAamy.Net.RxTimedWindow.Models
         {
             Console.WriteLine("GetTradePeriodObservable Thread id ={0}", Thread.CurrentThread.ManagedThreadId);
             var innerObservable = Observable.Interval(TimeSpan.FromSeconds(periodInMinutes), Scheduler.Default);
-            return Observable.Create<PowerPeriod>( async (observer, token) =>
+            var subscriptions = new CompositeDisposable();
+            return Observable.Create<PowerPeriod>(observer =>
             {
-                ManualResetEvent eventResetEvent = new ManualResetEvent(false);
 
-                using (innerObservable.Subscribe(async x =>
+                var innerDisposable = innerObservable.Subscribe(async x =>
                 {
-                    IEnumerable<PowerTrade> trades = await powerService.GetTradesAsync(DateTime.Now.Date);
-                    foreach (var powerTrade in trades)
+                    try
                     {
-                        foreach (var powerPeriod in powerTrade.Periods)
+                        IEnumerable<PowerTrade> trades = await powerService.GetTradesAsync(DateTime.Now.Date);
+                        int it = 0;
+                        Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                        foreach (var powerTrade in trades)
                         {
-                            observer.OnNext(powerPeriod);
+                            Console.WriteLine("Trade : {0}",it++);
+                            foreach (var powerPeriod in powerTrade.Periods)
+                            {
+                                observer.OnNext(powerPeriod);
+                            }
                         }
                     }
-                    if (token.IsCancellationRequested)
+                    catch (PowerServiceException esvc)
                     {
-                        Console.WriteLine("Cancellation Requested");
-                        eventResetEvent.Set();
+                        Console.WriteLine("PowerServiceException {0}",esvc.Message);
+                        //observer.OnError(esvc);
+                        //innerObservable.Retry();
                     }
-                }))
-                {
-                    eventResetEvent.WaitOne();
-                }
+                    catch (Exception e)
+                    {
+                        
+                        observer.OnError(e);
+                        innerObservable.Retry();
+                    }
+                });
+                subscriptions.Add(innerDisposable);
+                return subscriptions;
             });
         }
     }
