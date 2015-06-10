@@ -20,7 +20,7 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
         [Test]
         public void Subscribe()
         {
-            var client = new ObservableTradeModel();
+            var client = new ObservableTradeModel(new PowerService());
             client.GetTradePeriodObservable(1)
                 .ObserveOn(Scheduler.Default)
                 .SubscribeOn(TaskPoolScheduler.Default)

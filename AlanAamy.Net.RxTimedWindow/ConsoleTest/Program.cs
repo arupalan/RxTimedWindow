@@ -17,19 +17,25 @@ namespace ConsoleTest
         {
             CancellationToken token = new CancellationToken();
             Console.WriteLine("Main Thread id ={0}",Thread.CurrentThread.ManagedThreadId);
-            var client = new ObservableTradeModel();
-            client.GetTradePeriodObservable(1)
-                .ObserveOn(Scheduler.ThreadPool)
-                .SubscribeOn(TaskPoolScheduler.Default)
-                .Catch<PowerPeriod,PowerServiceException>( ex =>
+            var client = new ObservableTradeModel(new PowerService());
+            client.GetTradePeriodObservable(5)
+                //.ObserveOn(Scheduler.ThreadPool)
+                //.SubscribeOn(TaskPoolScheduler.Default)
+                .Catch((PowerServiceException ex) =>
                 {
-                    Console.WriteLine("catch Thread id ={0}", Thread.CurrentThread.ManagedThreadId);
+                    Console.WriteLine("Power catch Thread id ={0}", Thread.CurrentThread.ManagedThreadId);
                     Console.WriteLine(ex.Message);
                     return Observable.Empty <PowerPeriod>();
                 } )
-                .Subscribe((m => 
-                    Console.WriteLine("Trades Period,Volume: {0},{1}\tCurrent Time : {2} Current Thread:", m.Period, m.Volume, 
-                    DateTime.Now.ToLongTimeString()),Thread.CurrentThread.ManagedThreadId);
+                .Catch((Exception e) =>
+                {
+                    Console.WriteLine("General catch Thread id ={0}", Thread.CurrentThread.ManagedThreadId);
+                    Console.WriteLine(e.Message);
+                    return Observable.Empty<PowerPeriod>();                    
+                })
+                .Subscribe(m => 
+                    Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}", m.Period, m.Volume, 
+                    DateTime.Now.ToLongTimeString(),Thread.CurrentThread.ManagedThreadId));
             Console.ReadKey();
         }
     }
