@@ -37,17 +37,42 @@ namespace ConsoleTest
                 //    Console.WriteLine(e.Message);
                 //    return Observable.Empty<PowerPeriod>();
                 //})
-                .OnErrorResumeNext(Observable.Empty<PowerPeriod>())
-                .GroupBy( m => m.Period)
-                .Select(
-                s => new PowerPeriod
-                {
-                    Period = s.Key,
-                    Volume = s.Sum(_ => _.Volume).SingleAsync()
-                })
+                //.OnErrorResumeNext(Observable.Empty<PowerPeriod>())
+                //.GroupBy(m => m.Period)
+                //.Sel
+                //.SelectMany()
+                //.Subscribe(group =>
+                //    group.Count().Subscribe(count => Console.WriteLine("Key {0} , Count {1}", group.Key, count)));
+                //.Subscribe(group =>
+                //    group.Sum(_ => _.Volume).Subscribe(sum => Console.WriteLine("Key {0} , Sum {1}", group.Key, sum)));
+                //.SelectMany(grp => 
+                //            grp.Sum( _ => _.Volume)
+                //                    .Select( value => new
+                //                    {
+                //                       Period = grp.Key, Volume = value
+                //                    } )
+                //           )
+                //.Subscribe(m =>
+                //{
+                //    //Console.WriteLine("In Subscribe");
+                //    Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}", m.Period,
+                //        m.Volume,
+                //        DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId);
+                //});
                 .Subscribe(m =>
-                    Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}", m.Period, m.Volume,
-                    DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId));
+                {
+                    var powerPeriods = m.SelectMany(t => t.Periods).GroupBy(g => g.Period).Select(
+                        s => new PowerPeriod
+                        {
+                            Period = s.Key,
+                            Volume = s.Sum(_ => _.Volume)
+                        });
+                    foreach (var powerPeriod in powerPeriods)
+                        Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}",
+                            powerPeriod.Period,
+                            powerPeriod.Volume,
+                            DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId);
+                });
             Console.ReadKey();
             subscription.Dispose();
             //IPowerService powerService = new PowerService();
@@ -83,18 +108,18 @@ namespace ConsoleTest
             //        Console.WriteLine(e.Message);
             //        return Observable.Empty<IEnumerable<PowerTrade>>();
             //    })
-            //    .Subscribe(m =>
-            //    {
-            //        var powerPeriods = m.SelectMany( t => t.Periods).GroupBy(g => g.Period).Select(
-            //    s => new PowerPeriod
-            //    {
-            //        Period = s.Key,
-            //        Volume = s.Sum( _ => _.Volume)
-            //    });
-            //        foreach (var powerPeriod in powerPeriods)
-            //        Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}", powerPeriod.Period,
-            //            powerPeriod.Volume,
-            //            DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId);
+                //.Subscribe(m =>
+                //{
+                //    var powerPeriods = m.SelectMany( t => t.Periods).GroupBy(g => g.Period).Select(
+                //s => new PowerPeriod
+                //{
+                //    Period = s.Key,
+                //    Volume = s.Sum( _ => _.Volume)
+                //});
+                    //foreach (var powerPeriod in powerPeriods)
+                    //Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}", powerPeriod.Period,
+                    //    powerPeriod.Volume,
+                    //    DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId);
 
             //    });
             //Console.ReadKey();

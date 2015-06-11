@@ -19,12 +19,12 @@ namespace AlanAamy.Net.RxTimedWindow.Models
         {
             this.powerService = powerService;
         }
-        public IObservable<PowerPeriod> GetTradePeriodObservable(int periodInMinutes)
+        public IObservable<IEnumerable<PowerTrade>> GetTradePeriodObservable(int periodInMinutes)
         {
             Console.WriteLine("GetTradePeriodObservable Thread id ={0}", Thread.CurrentThread.ManagedThreadId);
             var innerObservable = Observable.Interval(TimeSpan.FromSeconds(periodInMinutes), Scheduler.Default);
             var subscriptions = new CompositeDisposable();
-            return Observable.Create<PowerPeriod>(observer =>
+            return Observable.Create<IEnumerable<PowerTrade>>(observer =>
             {
 
                 var innerDisposable = innerObservable.Subscribe(async x =>
@@ -34,20 +34,21 @@ namespace AlanAamy.Net.RxTimedWindow.Models
                         IEnumerable<PowerTrade> trades = await powerService.GetTradesAsync(DateTime.Now.Date);
                         int it = 0;
                         Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-                        foreach (var powerTrade in trades)
-                        {
-                            Console.WriteLine("Trade : {0}",it++);
-                            foreach (var powerPeriod in powerTrade.Periods)
-                            {
-                                observer.OnNext(powerPeriod);
-                            }
-                        }
+                        observer.OnNext(trades);
+                        //foreach (var powerTrade in trades)
+                        //{
+                        //    Console.WriteLine("Trade : {0}",it++);
+                        //    foreach (var powerPeriod in powerTrade.Periods)
+                        //    {
+                        //        observer.OnNext(powerPeriod);
+                        //    }
+                        //}
                     }
                     catch (PowerServiceException esvc)
                     {
                         Console.WriteLine("PowerServiceException {0}",esvc.Message);
                         //observer.OnError(esvc);
-                        //innerObservable.Retry();
+                        innerObservable.Retry();
                     }
                     catch (Exception e)
                     {
