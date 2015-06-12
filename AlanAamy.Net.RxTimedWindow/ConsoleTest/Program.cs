@@ -9,6 +9,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AlanAamy.Net.RxTimedWindow;
 using AlanAamy.Net.RxTimedWindow.Models;
 using Services;
 
@@ -32,6 +33,11 @@ namespace ConsoleTest
 
         static void Main(string[] args)
         {
+            var reporter = new IntraDayReporter();
+            reporter.Run(new PowerService(), Scheduler.Default,DateTime.Now,@"C:\Temp");
+            Console.ReadKey();
+            reporter.Stop();
+            /*
             CancellationTokenSource ts = new CancellationTokenSource();
             CancellationDisposable cancel = new CancellationDisposable();
 
@@ -46,8 +52,7 @@ namespace ConsoleTest
                     () => Log("Do Completed"))
                 .Subscribe(m =>
                 {
-                        m
-                        .Catch((PowerServiceException ex) =>
+                        m.Catch((PowerServiceException ex) =>
                         {
                             Console.WriteLine("PowerServiceException  {0}\tThread id ={1}",ex.Message, Thread.CurrentThread.ManagedThreadId);
                             return Observable.Empty<IEnumerable<PowerTrade>>();
@@ -56,7 +61,6 @@ namespace ConsoleTest
                         .SelectMany(t => t.SelectMany( x => x.Periods))
                         .GroupBy(g => g.Period)
                         .Select(p => new { Period = p.Key,Volume = p.Sum(_ => _.Volume)})
-                        //.Do()
                         .Subscribe(value =>
                         {
                             //var powerPeriods = value.SelectMany(t => t.Periods).GroupBy(g => g.Period).Select(
@@ -193,7 +197,7 @@ namespace ConsoleTest
             //    });
             //Console.ReadKey();
             //subscription.Dispose();
-
+            */
         }
     }
 }
