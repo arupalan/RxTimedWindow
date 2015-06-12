@@ -16,6 +16,20 @@ namespace ConsoleTest
 {
     class Program
     {
+
+        private static void Log(object onNextValue)
+        {
+            Console.WriteLine("Logging OnNext({0}) @ {1}", onNextValue, DateTime.Now);
+        }
+        private static void Log(PowerServiceException onErrorValue)
+        {
+            Console.WriteLine("Logging OnError({0}) @ {1}", onErrorValue, DateTime.Now);
+        }
+        private static void Log()
+        {
+            Console.WriteLine("Logging OnCompleted()@ {0}", DateTime.Now);
+        }
+
         static void Main(string[] args)
         {
             CancellationTokenSource ts = new CancellationTokenSource();
@@ -24,33 +38,45 @@ namespace ConsoleTest
             Console.WriteLine("Main Thread id ={0}", Thread.CurrentThread.ManagedThreadId);
 
             IPowerService svc = new PowerService();
-            var subscription = Observable.Interval(TimeSpan.FromSeconds(5), Scheduler.Default)
+            var subscription = Observable.Interval(TimeSpan.FromSeconds(10), Scheduler.Default)
                 .Select(i => Observable.FromAsync(() => svc.GetTradesAsync(DateTime.Now.Date)))
+                .Do(
+                    i => i.Count().Subscribe(count => Log(count)),
+                    ex => Log(ex.Message),
+                    () => Log("Do Completed"))
                 .Subscribe(m =>
                 {
                         m
                         .Catch((PowerServiceException ex) =>
                         {
-                            Console.WriteLine("Power catch Thread id ={0}", Thread.CurrentThread.ManagedThreadId);
-                            Console.WriteLine(ex.Message);
+                            Console.WriteLine("PowerServiceException  {0}\tThread id ={1}",ex.Message, Thread.CurrentThread.ManagedThreadId);
                             return Observable.Empty<IEnumerable<PowerTrade>>();
                         })
                         .Retry(5)
+                        .SelectMany(t => t.SelectMany( x => x.Periods))
+                        .GroupBy(g => g.Period)
+                        .Select(p => new { Period = p.Key,Volume = p.Sum(_ => _.Volume)})
+                        //.Do()
                         .Subscribe(value =>
                         {
-                            var powerPeriods = value.SelectMany(t => t.Periods).GroupBy(g => g.Period).Select(
-                                s => new PowerPeriod
-                                {
-                                    Period = s.Key,
-                                    Volume = s.Sum(_ => _.Volume)
-                                });
-                            foreach (var powerPeriod in powerPeriods)
+                            //var powerPeriods = value.SelectMany(t => t.Periods).GroupBy(g => g.Period).Select(
+                            //    s => new PowerPeriod
+                            //    {
+                            //        Period = s.Key,
+                            //        Volume = s.Sum(_ => _.Volume)
+                            //    });
+                            //foreach (var powerPeriod in powerPeriods)
+                            //Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}",
+                            //    powerPeriod.Period,
+                            //    powerPeriod.Volume,
+                            //    DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId);
+                            value.Volume.Subscribe(volume =>
                                 Console.WriteLine("Period {0}, Volume {1}\tCurrent Time : {2} Current Thread:{3}",
-                                    powerPeriod.Period,
-                                    powerPeriod.Volume,
-                                    DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId);
-                            
-                        });
+                                    value.Period,
+                                    volume,
+                                    DateTime.Now.ToLongTimeString(), Thread.CurrentThread.ManagedThreadId));
+
+                        },()=> Console.WriteLine("Completed\n"));
                 });
 
 

@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AlanAamy.Net.RxTimedWindow.Models;
+﻿using AlanAamy.Net.RxTimedWindow.Models;
 using NUnit.Framework;
-using System.Linq;
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using Services;
 
 namespace AlanAamy.Net.RxTimedWindow.Tests
