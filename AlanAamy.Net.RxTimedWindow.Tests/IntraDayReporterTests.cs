@@ -28,7 +28,7 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
                                                 new PowerPeriod { Period = 2, Volume = 30 }, 
                                                 new PowerPeriod { Period = 3, Volume = 40 }
                                                 )));
-            _testScheduler.Schedule()
+            //_testScheduler.Schedule()
         }
 
         public static IEnumerable<PowerTrade> CreateMockPowerTrades(DateTime date, int numTrades, params PowerPeriod[] powerPeriods)

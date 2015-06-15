@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using AlanAamy.Net.RxTimedWindow;
 using Services;
 
@@ -30,17 +31,17 @@ namespace ConsoleTest
         static void Main(string[] args)
         {
 
-            Observable.Range(1, 3)
-            .Materialize()
-            .Dump("Materialize");
+           // Observable.Range(1, 3)
+           // .Materialize()
+           // .Dump("Materialize");
 
-            var source = new Subject<int>();
-            source.Materialize()
-            .Dump("Materialize");
-            source.OnNext(1);
-            source.OnNext(2);
-            source.OnNext(3);
-            source.OnError(new Exception("Fail?"));
+           // var source = new Subject<int>();
+           // source.Materialize()
+           // .Dump("Materialize");
+           // source.OnNext(1);
+           // source.OnNext(2);
+           // source.OnNext(3);
+           // source.OnError(new Exception("Fail?"));
 
 
             DateTime date = DateTime.ParseExact(
@@ -58,11 +59,12 @@ namespace ConsoleTest
            "yyyy/MM/dd HH:mm:ss",
            CultureInfo.InvariantCulture);
 
-            var dateHelper = new DateTimeHelper(date);
-            var dateHelper1 = new DateTimeHelper(date1);
+           // var dateHelper = new DateTimeHelper(date);
+           // var dateHelper1 = new DateTimeHelper(date1);
 
             var reporter = new IntraDayReporter();
-            reporter.Run(new PowerService(), Scheduler.Default,date1,1,@"C:\Temp");
+            StringBuilder sb = new StringBuilder();
+            reporter.Run(new PowerService(), Scheduler.Default,date1,1,sb,@"C:\Temp");
             Console.ReadKey();
             reporter.Stop();
             /*

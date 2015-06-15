@@ -67,15 +67,15 @@ namespace AlanAamy.Net.RxTimedWindow
             XmlConfigurator.Configure();
         }
 
-        
-        public void Run(IPowerService svc,IScheduler scheduler,DateTime dtrunDate,int observeIntervalInMinutes, string csvFilePath)
+
+        public void Run(IPowerService svc, IScheduler scheduler, DateTime dtrunDate, int observeIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath)
         {
             var dateTimeHelper = new DateTimeHelper(dtrunDate);
             reporterDisposable = Observable.Interval(TimeSpan.FromMinutes(observeIntervalInMinutes), scheduler)
                 .Select(i => Observable.FromAsync(() => svc.GetTradesAsync(dtrunDate)))
                 .Subscribe(m =>
                 {
-                    StringBuilder sbpowerpositionLines = new StringBuilder();
+                    sbpowerpositionLines.Clear();
                     sbpowerpositionLines.AppendLine("Local Time,Volume");
                     m.Catch((PowerServiceException ex) =>
                     {
@@ -118,7 +118,7 @@ namespace AlanAamy.Net.RxTimedWindow
                            await stream.WriteAsync(sbpowerpositionLines.ToString());
                            await stream.FlushAsync();
                         }
-                        Log.Debug("Completed" + path + "\n");
+                        Log.Debug("Completed " + path + "\n");
                         
                     });
                 });
@@ -126,7 +126,8 @@ namespace AlanAamy.Net.RxTimedWindow
 
         public void Stop()
         {
-            reporterDisposable?.Dispose();
+            if(reporterDisposable != null)
+            reporterDisposable.Dispose();
         }
     }
 }
