@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.Globalization;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Reactive.Subjects;
 using AlanAamy.Net.RxTimedWindow;
-using AlanAamy.Net.RxTimedWindow.Models;
 using Services;
 
 namespace ConsoleTest
 {
+
+
+
     class Program
     {
 
@@ -33,8 +29,40 @@ namespace ConsoleTest
 
         static void Main(string[] args)
         {
+
+            Observable.Range(1, 3)
+            .Materialize()
+            .Dump("Materialize");
+
+            var source = new Subject<int>();
+            source.Materialize()
+            .Dump("Materialize");
+            source.OnNext(1);
+            source.OnNext(2);
+            source.OnNext(3);
+            source.OnError(new Exception("Fail?"));
+
+
+            DateTime date = DateTime.ParseExact(
+           "2011/03/27 10:42:33",
+           "yyyy/MM/dd HH:mm:ss",
+           CultureInfo.InvariantCulture);
+
+            DateTime date1 = DateTime.ParseExact(
+           "2011/03/28 10:42:33",
+           "yyyy/MM/dd HH:mm:ss",
+           CultureInfo.InvariantCulture);
+
+            DateTime date2 = DateTime.ParseExact(
+           "2011/10/29 10:42:33",
+           "yyyy/MM/dd HH:mm:ss",
+           CultureInfo.InvariantCulture);
+
+            var dateHelper = new DateTimeHelper(date);
+            var dateHelper1 = new DateTimeHelper(date1);
+
             var reporter = new IntraDayReporter();
-            reporter.Run(new PowerService(), Scheduler.Default,DateTime.Now,@"C:\Temp");
+            reporter.Run(new PowerService(), Scheduler.Default,date1,1,@"C:\Temp");
             Console.ReadKey();
             reporter.Stop();
             /*
