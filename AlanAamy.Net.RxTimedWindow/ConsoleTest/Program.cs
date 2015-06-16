@@ -44,27 +44,17 @@ namespace ConsoleTest
            // source.OnError(new Exception("Fail?"));
 
 
-            DateTime date = DateTime.ParseExact(
-           "2011/03/27 10:42:33",
-           "yyyy/MM/dd HH:mm:ss",
-           CultureInfo.InvariantCulture);
-
-            DateTime date1 = DateTime.ParseExact(
-           "2011/03/28 10:42:33",
-           "yyyy/MM/dd HH:mm:ss",
-           CultureInfo.InvariantCulture);
-
-            DateTime date2 = DateTime.ParseExact(
-           "2011/10/29 10:42:33",
-           "yyyy/MM/dd HH:mm:ss",
-           CultureInfo.InvariantCulture);
+            DateTime date = DateTime.ParseExact( "2011/03/27 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime date1 = DateTime.ParseExact( "2011/03/28 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime date2 = DateTime.ParseExact( "2011/10/29 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
            // var dateHelper = new DateTimeHelper(date);
            // var dateHelper1 = new DateTimeHelper(date1);
 
             var reporter = new IntraDayReporter();
             StringBuilder sb = new StringBuilder();
-            reporter.Run(new PowerService(), Scheduler.Default,date1,1,sb,@"C:\Temp");
+            TimeZoneInfo gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+            reporter.Run(new PowerService(), Scheduler.Default, date1, gmtTimeZoneInfo,1, sb, @"C:\Temp");
             Console.ReadKey();
             reporter.Stop();
             /*

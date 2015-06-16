@@ -15,48 +15,22 @@ namespace AlanAamy.Net.RxTimedWindow
 {
     public sealed class DateTimeHelper
     {
-        private static readonly TimeZoneInfo GmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
         public  readonly Dictionary<int, string> UtcIndexToLocalHourMap = new Dictionary<int, string>();
 
-        public DateTimeHelper(DateTime runDate)
+        public DateTimeHelper(DateTime runDate,TimeZoneInfo timeZoneInfo)
         {
             DateTime dateTimeStart = new DateTime(runDate.Year, runDate.Month, runDate.Day, 0, 0, 0, DateTimeKind.Unspecified).Date.AddHours(-1.0);
             DateTime dateTimeEnd = dateTimeStart.AddDays(1.0);
-            DateTime dateTimeUtcStart = TimeZoneInfo.ConvertTimeToUtc(dateTimeStart, GmtTimeZoneInfo);
-            DateTime dateTimeUtcEnd = TimeZoneInfo.ConvertTimeToUtc(dateTimeEnd, GmtTimeZoneInfo);
+            DateTime dateTimeUtcStart = TimeZoneInfo.ConvertTimeToUtc(dateTimeStart, timeZoneInfo);
+            DateTime dateTimeUtcEnd = TimeZoneInfo.ConvertTimeToUtc(dateTimeEnd, timeZoneInfo);
             int index = 0;
             for (DateTime dateTime = dateTimeUtcStart; dateTime < dateTimeUtcEnd; dateTime = dateTime.AddHours(1.0))
             {
-                UtcIndexToLocalHourMap.Add(++index, TimeZoneInfo.ConvertTimeFromUtc(dateTime, GmtTimeZoneInfo).ToString(@"HH:00"));
+                UtcIndexToLocalHourMap.Add(++index, TimeZoneInfo.ConvertTimeFromUtc(dateTime, timeZoneInfo).ToString(@"HH:00"));
             }           
         }
     }
 
-    public interface ISerializer
-    {
-        void Clear();
-        void AddPeriod(PowerPeriod period);
-        Task<IEnumerable<PowerPeriod>> SerializeAsync();
-    }
-
-    public sealed class Serializer : ISerializer
-    {
-        public void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddPeriod(PowerPeriod period)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<PowerPeriod>> SerializeAsync()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    
     public class IntraDayReporter
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -68,11 +42,14 @@ namespace AlanAamy.Net.RxTimedWindow
         }
 
 
-        public void Run(IPowerService svc, IScheduler scheduler, DateTime dtrunDate, int observeIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath)
+        public void Run(IPowerService svc, IScheduler scheduler, DateTime dtrunDate,TimeZoneInfo timeZoneInfo, 
+            int observationIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath,bool streamToMemoryOnly=false)
         {
-            var dateTimeHelper = new DateTimeHelper(dtrunDate);
-            reporterDisposable = Observable.Interval(TimeSpan.FromMinutes(observeIntervalInMinutes), scheduler)
+            var dateTimeHelper = new DateTimeHelper(dtrunDate,timeZoneInfo);
+
+            reporterDisposable = Observable.Interval(TimeSpan.FromMinutes(observationIntervalInMinutes), scheduler)
                 .Select(i => Observable.FromAsync(() => svc.GetTradesAsync(dtrunDate)))
+                .ObserveOn(scheduler)
                 .Subscribe(m =>
                 {
                     sbpowerpositionLines.Clear();
@@ -111,15 +88,24 @@ namespace AlanAamy.Net.RxTimedWindow
 
                     }, async () =>
                     {
+                        if (streamToMemoryOnly) return;
                         string path = Path.Combine(csvFilePath,
                             "PowerPosition" + dtrunDate.ToString("_yyyyMMdd_") + DateTime.Now.ToString("HHmm") + ".csv");
-                        using (var stream = new StreamWriter(path))
+                        if (Directory.Exists(csvFilePath))
                         {
-                           await stream.WriteAsync(sbpowerpositionLines.ToString());
-                           await stream.FlushAsync();
+                            using (var stream = new StreamWriter(path))
+                            {
+                                await stream.WriteAsync(sbpowerpositionLines.ToString());
+                                await stream.FlushAsync();
+                            }
+
+                            Log.Info("Completed " + path + "\n");
                         }
-                        Log.Debug("Completed " + path + "\n");
-                        
+                        else
+                        {
+                            Log.Error("Completed but Path " + path + " do not exist !!\n");
+                        }
+
                     });
                 });
         }
