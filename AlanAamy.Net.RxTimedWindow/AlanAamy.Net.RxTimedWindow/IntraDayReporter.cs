@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -33,6 +34,14 @@ namespace AlanAamy.Net.RxTimedWindow
 
     public class IntraDayReporter
     {
+        public enum StreamMode
+        {
+            [Description("Stream result to File")]
+            StreamToFile,
+            [Description("Stream Result to Memory")]
+            StreamToMemory
+        }
+
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private IDisposable reporterDisposable;
 
@@ -42,14 +51,13 @@ namespace AlanAamy.Net.RxTimedWindow
         }
 
 
-        public void Run(IPowerService svc, IScheduler scheduler, DateTime dtrunDate,TimeZoneInfo timeZoneInfo, 
-            int observationIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath,bool streamToMemoryOnly=false)
+        public void Run(IPowerService svc, IScheduler scheduler, DateTime dtrunDate,TimeZoneInfo timeZoneInfo,
+            int observationIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath, StreamMode streamMode = StreamMode.StreamToFile)
         {
             var dateTimeHelper = new DateTimeHelper(dtrunDate,timeZoneInfo);
 
             reporterDisposable = Observable.Interval(TimeSpan.FromMinutes(observationIntervalInMinutes), scheduler)
                 .Select(i => Observable.FromAsync(() => svc.GetTradesAsync(dtrunDate)))
-                .ObserveOn(scheduler)
                 .Subscribe(m =>
                 {
                     sbpowerpositionLines.Clear();
@@ -88,7 +96,7 @@ namespace AlanAamy.Net.RxTimedWindow
 
                     }, async () =>
                     {
-                        if (streamToMemoryOnly) return;
+                        if (streamMode == StreamMode.StreamToMemory) return;
                         string path = Path.Combine(csvFilePath,
                             "PowerPosition" + dtrunDate.ToString("_yyyyMMdd_") + DateTime.Now.ToString("HHmm") + ".csv");
                         if (Directory.Exists(csvFilePath))

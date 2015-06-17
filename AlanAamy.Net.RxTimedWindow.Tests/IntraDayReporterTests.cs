@@ -37,14 +37,20 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
         [Test]
         public void Should_Flatten_Trades_And_Aggregate_Periods_Per_Hour_LocalTime()
         {
+            //Arrange
             var intradayReporter = new IntraDayReporter();
-            DateTime date1 = DateTime.ParseExact( "2011/03/28 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-
+            DateTime date = DateTime.ParseExact( "2011/03/28 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
             StringBuilder sb = new StringBuilder();
             TimeZoneInfo gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
-            intradayReporter.Run(_powerService.Object, _testScheduler, date1, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), true);
-            _testScheduler.Start();
-            string output = sb.ToString();
+            var expected = "Local Time,Volume\r\n23:00,40\r\n00:00,60\r\n01:00,80\r\n";
+
+            //Act
+            intradayReporter.Run(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
+            _testScheduler.AdvanceBy(TimeSpan.FromMinutes(1).Ticks);
+            var actual = sb.ToString();
+
+            //Assert
+            Assert.AreEqual(expected,actual);
 
         }
 
