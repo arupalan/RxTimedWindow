@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EnergyService.cs" />
     <Compile Include="IntraDayReporter.cs" />
     <Compile Include="Models\ObservableTradeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

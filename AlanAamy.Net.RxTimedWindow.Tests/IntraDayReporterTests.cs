@@ -23,15 +23,6 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
         {
             _testScheduler = new TestScheduler();
             _powerService = new Mock<IPowerService>();
-            _powerService.Setup(p => p.GetTradesAsync(It.IsAny<DateTime>()))
-                .Returns(
-                
-                Task.FromResult(CreateMockPowerTrades(It.IsAny<DateTime>(), 2,
-                                                new PowerPeriod { Period = 1, Volume = 20 }, 
-                                                new PowerPeriod { Period = 2, Volume = 30 }, 
-                                                new PowerPeriod { Period = 3, Volume = 40 }
-                                                )));
-            //_testScheduler.Schedule()
         }
 
         [Test]
@@ -39,10 +30,18 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
         {
             //Arrange
             var intradayReporter = new IntraDayReporter();
+            _powerService.Setup(p => p.GetTradesAsync(It.IsAny<DateTime>()))
+                .Returns(
+
+                Task.FromResult(CreateMockPowerTrades(It.IsAny<DateTime>(), 2,
+                                                new PowerPeriod { Period = 1, Volume = 20 },
+                                                new PowerPeriod { Period = 2, Volume = 30 },
+                                                new PowerPeriod { Period = 3, Volume = 40 }
+                                                )));
             DateTime date = DateTime.ParseExact( "2011/03/28 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
             StringBuilder sb = new StringBuilder();
             TimeZoneInfo gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
-            var expected = "Local Time,Volume\r\n23:00,40\r\n00:00,60\r\n01:00,80\r\n";
+            const string expected = "Local Time,Volume\r\n23:00,40\r\n00:00,60\r\n01:00,80\r\n";
 
             //Act
             intradayReporter.Run(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
@@ -52,6 +51,11 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
             //Assert
             Assert.AreEqual(expected,actual);
 
+        }
+
+        public void Should_Catch_Exceptions()
+        {
+            //Arrange
         }
 
         public static IEnumerable<PowerTrade> CreateMockPowerTrades(DateTime date, int numTrades, params PowerPeriod[] powerPeriods)

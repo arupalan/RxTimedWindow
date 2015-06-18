@@ -52,7 +52,8 @@ namespace AlanAamy.Net.RxTimedWindow
 
 
         public void Run(IPowerService svc, IScheduler scheduler, DateTime dtrunDate,TimeZoneInfo timeZoneInfo,
-            int observationIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath, StreamMode streamMode = StreamMode.StreamToFile)
+            int observationIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath, 
+            StreamMode streamMode = StreamMode.StreamToFile)
         {
             var dateTimeHelper = new DateTimeHelper(dtrunDate,timeZoneInfo);
 
