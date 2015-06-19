@@ -7,25 +7,48 @@ using Services;
 
 namespace AlanAamy.Net.RxTimedWindow
 {
-    public interface IEnergyService<T>
+    public interface IEnergyService
     {
-        IEnumerable<T> GetTrades(DateTime date);
-        Task<IEnumerable<T>> GetTradesAsync(DateTime date);
+        IEnumerable<ITrade> GetTrades(DateTime date);
+        Task<IEnumerable<ITrade>> GetTradesAsync(DateTime date);
     }
 
-    public class EnergyService : IEnergyService<PowerTrade>
+    public interface IPowerPeriod
+    {
+        int Period { get; set; }
+
+        double Volume { get; set; }       
+    }
+
+    public interface ITrade
+    {
+        DateTime Date { get; set; }
+
+        IPowerPeriod[] Periods { get; set; }       
+    }
+
+    public class EnergyService : IEnergyService
     {
         private static readonly IPowerService SvcPowerService = new PowerService();
 
 
-        public IEnumerable<PowerTrade> GetTrades(DateTime date)
+        public IEnumerable<ITrade> GetTrades(DateTime date)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<PowerTrade>> GetTradesAsync(DateTime date)
+        public Task<IEnumerable<ITrade>> GetTradesAsync(DateTime date)
         {
-            throw new NotImplementedException();
+            PowerTrade[] powerTradeArray = Enumerable.ToArray<PowerTrade>(Enumerable.Select<int, PowerTrade>(Enumerable.Range(0, this._random.Next(1, 20)), (Func<int, PowerTrade>)(_ => PowerTrade.Create(date, numberOfPeriods))));
+            int index = 0;
+            for (DateTime dateTime5 = dateTime3; dateTime5 < dateTime4; dateTime5 = dateTime5.AddHours(1.0))
+            {
+                foreach (PowerTrade powerTrade in powerTradeArray)
+                    powerTrade.Periods[index].Volume = this._random.NextDouble() * 1000.0;
+                ++index;
+            }
+            return (IEnumerable<PowerTrade>)powerTradeArray;
+            return SvcPowerService.GetTradesAsync(date);
         }
     }
 }
