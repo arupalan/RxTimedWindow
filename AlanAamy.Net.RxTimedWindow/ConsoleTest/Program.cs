@@ -44,17 +44,19 @@ namespace ConsoleTest
            // source.OnError(new Exception("Fail?"));
 
 
-            DateTime date = DateTime.ParseExact( "2011/03/27 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-            DateTime date1 = DateTime.ParseExact( "2011/03/28 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-            DateTime date2 = DateTime.ParseExact( "2011/10/29 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-            DateTime date3 = DateTime.ParseExact( "2015/10/25 10:42:33", "yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime date = DateTime.ParseExact( "2011/03/27", "yyyy/MM/dd", CultureInfo.InvariantCulture);
+            DateTime date1 = DateTime.ParseExact( "2011/03/28", "yyyy/MM/dd", CultureInfo.InvariantCulture);
+            DateTime date2 = DateTime.ParseExact( "2011/10/29", "yyyy/MM/dd", CultureInfo.InvariantCulture);
+            DateTime date3 = DateTime.ParseExact( "2015/03/29", "yyyy/MM/dd", CultureInfo.InvariantCulture);
+            DateTime date4 = DateTime.ParseExact( "2015/10/25", "yyyy/MM/dd", CultureInfo.InvariantCulture);
+            DateTime date5 = DateTime.ParseExact( "2015/10/24", "yyyy/MM/dd", CultureInfo.InvariantCulture);
            // var dateHelper = new DateTimeHelper(date);
            // var dateHelper1 = new DateTimeHelper(date1);
 
             var reporter = new IntraDayReporter();
             StringBuilder sb = new StringBuilder();
             TimeZoneInfo gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
-            reporter.Run1(new PowerService(), Scheduler.Default, date3, gmtTimeZoneInfo,1, sb, @"C:\Temp");
+            reporter.Run1(new PowerService(), Scheduler.Default, date5, gmtTimeZoneInfo,1, sb, @"C:\Temp");
             Console.ReadKey();
             reporter.Stop();
         }
