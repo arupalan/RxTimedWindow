@@ -71,11 +71,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PowerServiceAdapter.cs" />
+    <Compile Include="DateTimeHelper.cs" />
     <Compile Include="IntraDayReporter.cs" />
-    <Compile Include="Models\ObservableTradeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleExtentions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

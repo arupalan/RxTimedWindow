@@ -44,7 +44,7 @@
       <HintPath>..\AlanAamy.Net.RxTimedWindow\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="PowerService">
-      <HintPath>..\..\RxTimedWindow\AlanAamy.Net.RxTimedWindow\Lib\PowerService.dll</HintPath>
+      <HintPath>..\AlanAamy.Net.RxTimedWindow\Lib\PowerService.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -71,7 +71,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EnergyServiceTests.cs" />
     <Compile Include="IntraDayReporterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

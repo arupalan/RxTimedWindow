@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Concurrency;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Reactive.Testing;
@@ -46,7 +44,7 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
             const string expected = "Local Time,Volume\r\n23:00,40\r\n00:00,60\r\n01:00,80\r\n";
 
             //Act
-            intradayReporter.Run1(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
+            intradayReporter.Run(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
             _testScheduler.AdvanceBy(TimeSpan.FromMinutes(1).Ticks);
             var actual = sb.ToString();
 
@@ -82,7 +80,7 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
             const string expectedsecond = "Local Time,Volume\r\n23:00,30\r\n00:00,30\r\n01:00,30\r\n";
 
             //Act
-            intradayReporter.Run1(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
+            intradayReporter.Run(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
             _testScheduler.AdvanceBy(TimeSpan.FromMinutes(1).Ticks);
             var actual = sb.ToString();
 
@@ -136,7 +134,7 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
             const string expected = "Local Time,Volume\r\n23:00,20\r\n00:00,20\r\n02:00,20\r\n03:00,20\r\n04:00,20\r\n05:00,20\r\n06:00,20\r\n07:00,20\r\n08:00,20\r\n09:00,20\r\n10:00,20\r\n11:00,20\r\n12:00,20\r\n13:00,20\r\n14:00,20\r\n15:00,20\r\n16:00,20\r\n17:00,20\r\n18:00,20\r\n19:00,20\r\n20:00,20\r\n21:00,20\r\n";
 
             //Act
-            intradayReporter.Run1(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
+            intradayReporter.Run(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
             _testScheduler.AdvanceBy(TimeSpan.FromMinutes(1).Ticks);
             var actual = sb.ToString();
 
@@ -186,7 +184,7 @@ namespace AlanAamy.Net.RxTimedWindow.Tests
                 "Local Time,Volume\r\n23:00,20\r\n00:00,20\r\n01:00,20\r\n01:00,20\r\n02:00,20\r\n03:00,20\r\n04:00,20\r\n05:00,20\r\n06:00,20\r\n07:00,20\r\n08:00,20\r\n09:00,20\r\n10:00,20\r\n11:00,20\r\n12:00,20\r\n13:00,20\r\n14:00,20\r\n15:00,20\r\n16:00,20\r\n17:00,20\r\n18:00,20\r\n19:00,20\r\n20:00,20\r\n21:00,20\r\n22:00,20\r\n";
 
             //Act
-            intradayReporter.Run1(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
+            intradayReporter.Run(_powerService.Object, _testScheduler, date, gmtTimeZoneInfo, 1, sb, It.IsAny<String>(), IntraDayReporter.StreamMode.StreamToMemory);
             _testScheduler.AdvanceBy(TimeSpan.FromMinutes(1).Ticks);
             var actual = sb.ToString();
 

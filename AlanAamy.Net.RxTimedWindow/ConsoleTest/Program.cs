@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Text;
 using AlanAamy.Net.RxTimedWindow;
 using Services;
@@ -56,7 +54,7 @@ namespace ConsoleTest
             var reporter = new IntraDayReporter();
             StringBuilder sb = new StringBuilder();
             TimeZoneInfo gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
-            reporter.Run1(new PowerService(), Scheduler.Default, date5, gmtTimeZoneInfo,1, sb, @"C:\Temp");
+            reporter.Run(new PowerService(), Scheduler.Default, date5, gmtTimeZoneInfo,1, sb, @"C:\Temp");
             Console.ReadKey();
             reporter.Stop();
         }
