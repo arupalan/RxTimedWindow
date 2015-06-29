@@ -7,14 +7,22 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks.Dataflow;
 using log4net;
 using log4net.Config;
 using Services;
 
 namespace AlanAamy.Net.RxTimedWindow
 {
-    public class IntraDayReporter
+    public interface IIntraDayReporter
+    {
+        void Run(IPowerService svc, IScheduler scheduler, DateTime dtrunDate, TimeZoneInfo timeZoneInfo,
+            int observationIntervalInMinutes, StringBuilder sbpowerpositionLines, string csvFilePath, 
+            IntraDayReporter.StreamMode streamMode = IntraDayReporter.StreamMode.StreamToFile);
+
+        void Stop();
+    }
+
+    public class IntraDayReporter : IIntraDayReporter
     {
         public enum StreamMode
         {
