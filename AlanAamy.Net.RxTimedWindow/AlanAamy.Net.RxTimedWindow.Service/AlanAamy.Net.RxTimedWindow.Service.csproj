@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,7 +36,6 @@
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="PowerService">
       <HintPath>..\Lib\PowerService.dll</HintPath>
@@ -54,7 +53,6 @@
     </Reference>
     <Reference Include="System.Reactive.PlatformServices">
       <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -85,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AlanAamy.Net.RxTimedWindow\AlanAamy.Net.RxTimedWindow.csproj">
-      <Project>{57a7b59e-d167-4f43-a96b-b0e15fb3fc43}</Project>
+      <Project>{57A7B59E-D167-4F43-A96B-B0E15FB3FC43}</Project>
       <Name>AlanAamy.Net.RxTimedWindow</Name>
     </ProjectReference>
   </ItemGroup>

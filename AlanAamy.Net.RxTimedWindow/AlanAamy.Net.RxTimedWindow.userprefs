@@ -1,0 +1,14 @@
+﻿<Properties StartupItem="ConsoleTest\ConsoleTest.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ConsoleTest\Program.cs">
+    <Files>
+      <File FileName="ConsoleTest\Program.cs" Line="32" Column="35" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="C:\Users\arup.banerjee\Source\Repos\RxTimedWindow\AlanAamy.Net.RxTimedWindow\ConsoleTest\Program.cs" line="54" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
