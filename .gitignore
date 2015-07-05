@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+TemporaryGeneratedFile_*
 
 # Build results
 [Dd]ebug/

@@ -4,12 +4,12 @@ using System.ServiceProcess;
 
 namespace AlanAamy.Net.RxTimedWindow.Service
 {
-    static class Program
+    internal static class Program
     {
         /// <summary>
-        /// The main entry point for the application.
+        ///     The main entry point for the application.
         /// </summary>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Contains("-console"))
             {
@@ -23,7 +23,6 @@ namespace AlanAamy.Net.RxTimedWindow.Service
             }
             else
             {
-
                 ServiceBase[] ServicesToRun;
                 ServicesToRun = new ServiceBase[]
                 {
